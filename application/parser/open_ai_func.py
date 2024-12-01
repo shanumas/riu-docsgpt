@@ -53,7 +53,7 @@ def call_openai_api(docs, folder_name, id, task_status):
     s1 = len(docs)
     for i in tqdm(
         docs,
-        desc="Embedding 🦖",
+        desc="Embedding riuDocs",
         unit="docs",
         total=len(docs),
         bar_format="{l_bar}{bar}| Time Left: {remaining}",
