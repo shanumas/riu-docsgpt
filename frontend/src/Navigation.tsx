@@ -8,11 +8,8 @@ import Add from './assets/add.svg';
 import openNewChat from './assets/openNewChat.svg';
 import Hamburger from './assets/hamburger.svg';
 import DocsGPT3 from './assets/riu.png';
-import Discord from './assets/discord.svg';
 import Expand from './assets/expand.svg';
-import Github from './assets/github.svg';
 import SettingGear from './assets/settingGear.svg';
-import Twitter from './assets/TwitterX.svg';
 import UploadIcon from './assets/upload.svg';
 import SourceDropdown from './components/SourceDropdown';
 import {
@@ -45,7 +42,6 @@ import Spinner from './assets/spinner.svg';
 import SpinnerDark from './assets/spinner-dark.svg';
 import { selectQueries } from './conversation/conversationSlice';
 import Upload from './upload/Upload';
-import Help from './components/Help';
 
 interface NavigationProps {
   navOpen: boolean;
@@ -397,53 +393,6 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 {t('settings.label')}
               </p>
             </NavLink>
-          </div>
-          <div className="flex flex-col justify-end text-eerie-black dark:text-white">
-            <div className="flex justify-between items-center py-1">
-              <Help />
-
-              <div className="flex items-center gap-1 pr-4">
-                <NavLink
-                  target="_blank"
-                  to={'https://discord.gg/WHJdfbQDR4'}
-                  className={
-                    'rounded-full hover:bg-gray-100 dark:hover:bg-[#28292E]'
-                  }
-                >
-                  <img
-                    src={Discord}
-                    alt="discord"
-                    className="m-2 w-6 self-center filter dark:invert"
-                  />
-                </NavLink>
-                <NavLink
-                  target="_blank"
-                  to={'https://twitter.com/docsgptai'}
-                  className={
-                    'rounded-full hover:bg-gray-100 dark:hover:bg-[#28292E]'
-                  }
-                >
-                  <img
-                    src={Twitter}
-                    alt="x"
-                    className="m-2 w-5 self-center filter dark:invert"
-                  />
-                </NavLink>
-                <NavLink
-                  target="_blank"
-                  to={'https://github.com/arc53/docsgpt'}
-                  className={
-                    'rounded-full hover:bg-gray-100 dark:hover:bg-[#28292E]'
-                  }
-                >
-                  <img
-                    src={Github}
-                    alt="github"
-                    className="m-2 w-6 self-center filter dark:invert"
-                  />
-                </NavLink>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@
   "myPlan": "My Plan",
   "about": "About",
   "inputPlaceholder": "Type your message here...",
-  "tagline": "DocsGPT uses GenAI, please review critical information using sources.",
+  "tagline": "riuGPT uses GenAI, please review critical information using sources.",
   "sourceDocs": "Source",
   "none": "None",
   "cancel": "Cancel",
@@ -15,8 +15,8 @@
   "documentation": "Documentation",
   "demo": [
     {
-      "header": "Learn about DocsGPT",
-      "query": "What is DocsGPT?"
+      "header": "Learn about riuGPT",
+      "query": "What is riuGPT?"
     },
     {
       "header": "Summarize documentation",
@@ -78,7 +78,7 @@
   "modals": {
     "uploadDoc": {
       "label": "Upload new document",
-      "select": "Choose how to upload your document to DocsGPT",
+      "select": "Choose how to upload your document to riuGPT",
       "file": "Upload from device",
       "back": "Back",
       "wait": "Please wait ...",
@@ -129,8 +129,8 @@
   },
   "sharedConv": {
     "subtitle": "Created with",
-    "button": "Get Started with DocsGPT",
-    "meta": "DocsGPT uses GenAI, please review critical information using sources."
+    "button": "Get Started with riuGPT",
+    "meta": "riuGPT uses GenAI, please review critical information using sources."
   },
   "convTile": {
     "share": "Share",
