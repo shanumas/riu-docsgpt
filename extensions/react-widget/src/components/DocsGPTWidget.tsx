@@ -527,9 +527,9 @@ export const WidgetCore = ({
   apiKey = '82962c9a-aa77-4152-94e5-a4f84fd44c6a',
   avatar = 'https://d3dg1063dc54p9.cloudfront.net/cute-docsgpt.png',
   title = 'Get AI assistance',
-  description = 'DocsGPT\'s AI Chatbot is here to help',
-  heroTitle = 'Welcome to DocsGPT !',
-  heroDescription = 'This chatbot is built with DocsGPT and utilises GenAI, please review important information using sources.',
+  description = 'riuGPT\'s AI Chatbot is here to help',
+  heroTitle = 'Welcome to riuGPT !',
+  heroDescription = 'This chatbot is built with riuGPT and utilises GenAI, please review important information using sources.',
   size = 'small',
   theme = 'dark',
   collectFeedback = true,
@@ -787,7 +787,7 @@ export const WidgetCore = ({
               </PromptContainer>
               <Tagline>
                 Powered by&nbsp;
-                <Hyperlink target='_blank' href='https://www.docsgpt.cloud/'>DocsGPT</Hyperlink>
+                <Hyperlink target='_blank' href='https://www.docsgpt.cloud/'>riuGPT</Hyperlink>
               </Tagline>
             </div>
           </StyledContainer>

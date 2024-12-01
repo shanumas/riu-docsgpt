@@ -106,16 +106,16 @@ router.render = (req, res) => {
     console.log('hre');
     if (id === 'creative')
       res.status(200).json({
-        "content": "You are a DocsGPT, friendly and helpful AI assistant by Arc53 that provides help with documents. You give thorough answers with code examples if possible."
+        "content": "You are a riuGPT, friendly and helpful AI assistant by Arc53 that provides help with documents. You give thorough answers with code examples if possible."
       })
     else if (id === 'strict') {
       res.status(200).json({
-        "content": "You are an AI Assistant, DocsGPT, adept at offering document assistance. \nYour expertise lies in providing answer on top of provided context."
+        "content": "You are an AI Assistant, riuGPT, adept at offering document assistance. \nYour expertise lies in providing answer on top of provided context."
       })
     }
     else {
       res.status(200).json({
-        "content": "You are a helpful AI assistant, DocsGPT, specializing in document assistance, designed to offer detailed and informative responses."
+        "content": "You are a helpful AI assistant, riuGPT, specializing in document assistance, designed to offer detailed and informative responses."
       })
     }
   }
