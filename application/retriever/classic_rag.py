@@ -56,26 +56,61 @@ class ClassicRAG(BaseRetriever):
         ]
         return docs
 
-    def _get_data(self):
-        # Determine how to split chunks between primary and additional vector stores
-        # For example, allocate half to each
-        chunks_additional = self.chunks // 2
-        chunks_primary = self.chunks - chunks_additional
+    def _retrieve_guidelines(self):
+        """
+        Retrieve the exact guidelines from the additional vector store using the LLM.
+        """
+        if not self.additional_vectorstore:
+            print("Additional vector store not initialized.")
+            return ""
 
-        # Retrieve from additional vector store
-        additional_docs = self._get_data_from_vectorstore(self.additional_vectorstore, chunks_additional)
+        # Retrieve relevant documents from the additional vector store
+        guidelines_docs = self._get_data_from_vectorstore(self.additional_vectorstore, k=1)  # Assuming k=1 for exact guidelines
 
-        # Retrieve from primary vector store
-        primary_docs = self._get_data_from_vectorstore(self.primary_vectorstore, chunks_primary)
+        if not guidelines_docs:
+            print("No guidelines found in the additional vector store.")
+            return ""
 
-        # Combine documents, ensuring no duplicates based on the title
-        combined_docs_dict = {doc['title']: doc for doc in additional_docs + primary_docs}
+        # Extract the text from the retrieved document
+        guidelines_text = guidelines_docs[0]["text"]
+
+        # Optionally, you can perform additional processing or validation here
+
+        return guidelines_text
+
+    def _get_data(self, guidelines_text):
+        """
+        Retrieve documents from the primary vector store and combine with guidelines.
+        """
+        if not self.primary_vectorstore:
+            print("Primary vector store not initialized.")
+            return []
+
+        # Retrieve documents from the primary vector store
+        primary_docs = self._get_data_from_vectorstore(self.primary_vectorstore, self.chunks)
+
+        # Combine primary documents with guidelines
+        # Here, we include the guidelines as an additional document
+        combined_docs = primary_docs.copy()
+        if guidelines_text:
+            combined_docs.append({
+                "title": "Emission_Guidelines",
+                "text": guidelines_text,
+                "source": "guidelines"
+            })
+
+        # Optionally, remove duplicates based on title
+        combined_docs_dict = {doc['title']: doc for doc in combined_docs}
         combined_docs = list(combined_docs_dict.values())
 
         return combined_docs
 
     def gen(self):
-        docs = self._get_data()
+        # Step 1: Retrieve guidelines from the additional vector store
+        guidelines_text = self._retrieve_guidelines()
+
+        # Step 2: Retrieve primary documents and combine with guidelines
+        docs = self._get_data(guidelines_text)
 
         # Join all page_content together with a newline
         docs_together = "\n".join([doc["text"] for doc in docs])
@@ -104,6 +139,7 @@ class ClassicRAG(BaseRetriever):
                         )
         messages_combine.append({"role": "user", "content": self.question})
 
+        # Step 3: Make the second LLM call with combined context
         llm = LLMCreator.create_llm(
             settings.LLM_NAME, api_key=settings.API_KEY, user_api_key=self.user_api_key
         )
@@ -112,7 +148,10 @@ class ClassicRAG(BaseRetriever):
             yield {"answer": str(line)}
 
     def search(self):
-        return self._get_data()
+        # This method can be adjusted based on specific needs
+        # For now, it retrieves combined data
+        guidelines_text = self._retrieve_guidelines()
+        return self._get_data(guidelines_text)
     
     def get_params(self):
         return {
