@@ -12,16 +12,16 @@ class ClassicRAG(BaseRetriever):
         self,
         question,
         source,
-        chat_history,
-        prompt,
+        chat_history=None,
+        prompt="",
         chunks=2,
         token_limit=150,
         gpt_model="docsgpt",
         user_api_key=None,
     ):
         self.question = question
-        self.vectorstore = source['active_docs'] if 'active_docs' in source else None
-        self.chat_history = chat_history
+        self.primary_vectorstore = source.get('active_docs', None)
+        self.chat_history = chat_history if chat_history else []
         self.prompt = prompt
         self.chunks = chunks
         self.gpt_model = gpt_model
@@ -37,44 +37,58 @@ class ClassicRAG(BaseRetriever):
         )
         self.user_api_key = user_api_key
 
-    def _get_data(self):
-        if self.chunks == 0:
-            docs = []
-        else:
-            docsearch = VectorCreator.create_vectorstore(
-                settings.VECTOR_STORE, self.vectorstore, settings.EMBEDDINGS_KEY
-            )
-            docs_temp = docsearch.search(self.question, k=self.chunks)
-            docs = [
-                {
-                    "title": i.metadata.get(
-                        "title", i.metadata.get("post_title", i.page_content)
-                    ).split("/")[-1],
-                    "text": i.page_content,
-                    "source": (
-                        i.metadata.get("source")
-                        if i.metadata.get("source")
-                        else "local"
-                    ),
-                }
-                for i in docs_temp
-            ]
-        print('CLASSIC RAG CALLED')
+        # Initialize the additional vector store internally
+        self.additional_vectorstore = "674d48ccc3527214d3b90d6f"
+
+    def _get_data_from_vectorstore(self, vectorstore, k):
+        if k == 0 or not vectorstore:
+            return []
+        docs_temp = vectorstore.search(self.question, k=k)
+        docs = [
+            {
+                "title": i.metadata.get(
+                    "title", i.metadata.get("post_title", i.page_content)
+                ).split("/")[-1],
+                "text": i.page_content,
+                "source": i.metadata.get("source", "local"),
+            }
+            for i in docs_temp
+        ]
         return docs
+
+    def _get_data(self):
+        # Determine how to split chunks between primary and additional vector stores
+        # For example, allocate half to each
+        chunks_additional = self.chunks // 2
+        chunks_primary = self.chunks - chunks_additional
+
+        # Retrieve from additional vector store
+        additional_docs = self._get_data_from_vectorstore(self.additional_vectorstore, chunks_additional)
+
+        # Retrieve from primary vector store
+        primary_docs = self._get_data_from_vectorstore(self.primary_vectorstore, chunks_primary)
+
+        # Combine documents, ensuring no duplicates based on the title
+        combined_docs_dict = {doc['title']: doc for doc in additional_docs + primary_docs}
+        combined_docs = list(combined_docs_dict.values())
+
+        return combined_docs
 
     def gen(self):
         docs = self._get_data()
 
-        # join all page_content together with a newline
+        # Join all page_content together with a newline
         docs_together = "\n".join([doc["text"] for doc in docs])
         p_chat_combine = self.prompt.replace("{summaries}", docs_together)
         messages_combine = [{"role": "system", "content": p_chat_combine}]
+        
+        # Yield sources
         for doc in docs:
             yield {"source": doc}
 
         if len(self.chat_history) > 1:
             tokens_current_history = 0
-            # count tokens in history
+            # Count tokens in history
             for i in self.chat_history:
                 if "prompt" in i and "response" in i:
                     tokens_batch = num_tokens_from_string(i["prompt"]) + num_tokens_from_string(
@@ -103,7 +117,8 @@ class ClassicRAG(BaseRetriever):
     def get_params(self):
         return {
             "question": self.question,
-            "source": self.vectorstore,
+            "source": self.primary_vectorstore,
+            # No need to pass additional_source as it's handled internally
             "chat_history": self.chat_history,
             "prompt": self.prompt,
             "chunks": self.chunks,

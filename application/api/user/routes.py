@@ -563,31 +563,6 @@ class CombinedJson(Resource):
                     }
                 )
 
-            if "duckduck_search" in settings.RETRIEVERS_ENABLED:
-                data.append(
-                    {
-                        "name": "DuckDuckGo Search",
-                        "date": "duckduck_search",
-                        "model": settings.EMBEDDINGS_NAME,
-                        "location": "custom",
-                        "tokens": "",
-                        "retriever": "duckduck_search",
-                    }
-                )
-
-            if "brave_search" in settings.RETRIEVERS_ENABLED:
-                data.append(
-                    {
-                        "name": "Brave Search",
-                        "language": "en",
-                        "date": "brave_search",
-                        "model": settings.EMBEDDINGS_NAME,
-                        "location": "custom",
-                        "tokens": "",
-                        "retriever": "brave_search",
-                    }
-                )
-
         except Exception as err:
             return make_response(jsonify({"success": False, "error": str(err)}), 400)
 

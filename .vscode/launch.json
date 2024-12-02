@@ -1,16 +1,22 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "Docker Debug Frontend",
-      "request": "launch",
-      "type": "chrome",
-      "preLaunchTask": "docker-compose: debug:frontend",
-      "url": "http://127.0.0.1:5173",
-      "webRoot": "${workspaceFolder}/frontend",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
-    }
+      {
+          "name": "Python: Flask",
+          "type": "python",
+          "pythonPath": "${workspaceRoot}/venv/bin/python3.12",
+          "request": "launch",
+          "module": "flask",
+          "env": {
+              "FLASK_APP": "application/app.py",
+              "FLASK_ENV": "development"
+          },
+          "args": [
+              "run",
+              "--host=0.0.0.0",
+              "--port=7091"
+          ],
+          "jinja": true
+      }
   ]
 }
