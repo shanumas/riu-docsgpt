@@ -34,14 +34,14 @@ answer = Blueprint("answer", __name__)
 answer_ns = Namespace("answer", description="Answer related operations", path="/")
 api.add_namespace(answer_ns)
 
-gpt_model = ""
+gpt_model = "gpt-4o-mini"
 # to have some kind of default behaviour
-if settings.LLM_NAME == "openai":
+""" if settings.LLM_NAME == "openai":
     gpt_model = "gpt-3.5-turbo"
 elif settings.LLM_NAME == "anthropic":
     gpt_model = "claude-2"
 elif settings.LLM_NAME == "groq":
-    gpt_model = "llama3-8b-8192"
+    gpt_model = "llama3-8b-8192" """
 
 if settings.MODEL_NAME:  # in case there is particular model name configured
     gpt_model = settings.MODEL_NAME
