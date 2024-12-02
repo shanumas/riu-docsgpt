@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     UPLOAD_FOLDER: str = "inputs"
     PARSE_PDF_AS_IMAGE: bool = False
     VECTOR_STORE: str = "faiss" #  "faiss" or "elasticsearch" or "qdrant" or "milvus" or "lancedb"
-    RETRIEVERS_ENABLED: list = ["classic_rag", "duckduck_search"] # also brave_search
+    RETRIEVERS_ENABLED: list = ["classic_rag"] # also brave_search
 
     # LLM Cache
     CACHE_REDIS_URL: str = "redis://localhost:6379/2"

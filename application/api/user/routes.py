@@ -101,6 +101,7 @@ class GetConversations(Resource):
         description="Retrieve a list of the latest 30 conversations",
     )
     def get(self):
+        print("Conversations called")
         try:
             conversations = conversations_collection.find().sort("date", -1).limit(30)
             list_conversations = [

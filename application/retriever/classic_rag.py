@@ -59,7 +59,7 @@ class ClassicRAG(BaseRetriever):
                 }
                 for i in docs_temp
             ]
-
+        print('CLASSIC RAG CALLED')
         return docs
 
     def gen(self):
