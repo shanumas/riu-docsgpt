@@ -367,7 +367,35 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 }}
               ></img>
             </div>
-            <p className="ml-5 mt-3 text-sm font-semibold">{t('sourceDocs')}</p>
+            <p className="ml-5 mt-3 text-sm font-semibold">Guidelines</p>
+          </div>
+          <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
+            <div className="relative my-4 mx-4 flex gap-2">
+              <SourceDropdown
+                options={docs}
+                selectedDocs={selectedDocs}
+                setSelectedDocs={setSelectedDocs}
+                isDocsListOpen={isDocsListOpen}
+                setIsDocsListOpen={setIsDocsListOpen}
+                handleDeleteClick={handleDeleteClick}
+                handlePostDocumentSelect={(option?: string) => {
+                  if (isMobile) {
+                    setNavOpen(!navOpen);
+                  }
+                }}
+              />
+              <img
+                className="mt-2 h-9 w-9 hover:cursor-pointer"
+                src={UploadIcon}
+                onClick={() => {
+                  setUploadModalState('ACTIVE');
+                  if (isMobile) {
+                    setNavOpen(!navOpen);
+                  }
+                }}
+              ></img>
+            </div>
+            <p className="ml-5 mt-3 text-sm font-semibold">User files</p>
           </div>
           <div className="flex flex-col gap-2 border-b-[1px] py-2 dark:border-b-purple-taupe">
             <NavLink

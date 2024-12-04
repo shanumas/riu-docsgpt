@@ -150,7 +150,7 @@ frontend/dist-ssr
 frontend/*.local
 
 # Editor directories and files
-frontend/.vscode/*
+#frontend/.vscode/*
 frontend/!.vscode/extensions.json
 frontend/.idea
 frontend/.DS_Store

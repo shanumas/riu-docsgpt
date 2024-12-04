@@ -65,7 +65,7 @@ class ClassicRAG(BaseRetriever):
             return ""
 
         # Retrieve relevant documents from the additional vector store
-        guidelines_docs = self._get_data_from_vectorstore(self.additional_vectorstore, k=1)  # Assuming k=1 for exact guidelines
+        guidelines_docs = self._get_data_from_vectorstore(self.additional_vectorstore, k=2)  # Assuming k=2 for exact guidelines
 
         if not guidelines_docs:
             print("No guidelines found in the additional vector store.")
