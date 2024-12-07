@@ -37,6 +37,16 @@ const preloadedState: { preference: Preference } = {
         retriever: 'clasic',
       },
     ],
+    sourceGuideDocs: [
+      {
+        name: 'default',
+        date: '',
+        model: '1.0',
+        type: 'remote',
+        id: 'default',
+        retriever: 'clasic',
+      },
+    ],
     modalState: 'INACTIVE',
     paginatedDocuments: null,
   },

@@ -14,7 +14,9 @@ export interface Preference {
   chunks: string;
   token_limit: number;
   selectedDocs: Doc | null;
+  selectedGuideDocs: Doc | null;
   sourceDocs: Doc[] | null;
+  sourceGuideDocs: Doc[] | null;
   conversations: {
     data: { name: string; id: string }[] | null;
     loading: boolean;
@@ -37,7 +39,17 @@ const initialState: Preference = {
     model: 'openai_text-embedding-ada-002',
     retriever: 'classic',
   } as Doc,
+  selectedGuideDocs: {
+    id: 'default',
+    name: 'default',
+    type: 'remote',
+    date: 'default',
+    docLink: 'default',
+    model: 'openai_text-embedding-ada-002',
+    retriever: 'classic',
+  } as Doc,
   sourceDocs: null,
+  sourceGuideDocs: null,
   conversations: {
     data: null,
     loading: false,
@@ -56,8 +68,14 @@ export const prefSlice = createSlice({
     setSelectedDocs: (state, action) => {
       state.selectedDocs = action.payload;
     },
+    setSelectedGuideDocs: (state, action) => {
+      state.selectedGuideDocs = action.payload;
+    },
     setSourceDocs: (state, action) => {
       state.sourceDocs = action.payload;
+    },
+    setSourceGuideDocs: (state, action) => {
+      state.sourceGuideDocs = action.payload;
     },
     setPaginatedDocuments: (state, action) => {
       state.paginatedDocuments = action.payload;
@@ -83,7 +101,9 @@ export const prefSlice = createSlice({
 export const {
   setApiKey,
   setSelectedDocs,
+  setSelectedGuideDocs,
   setSourceDocs,
+  setSourceGuideDocs,
   setConversations,
   setPrompt,
   setChunks,
@@ -147,12 +167,18 @@ export const selectApiKeyStatus = (state: RootState) =>
   !!state.preference.apiKey;
 export const selectSelectedDocsStatus = (state: RootState) =>
   !!state.preference.selectedDocs;
+export const selectSelectedGuideDocsStatus = (state: RootState) =>
+  !!state.preference.selectedGuideDocs;
 export const selectSourceDocs = (state: RootState) =>
   state.preference.sourceDocs;
+export const selectGuideSourceDocs = (state: RootState) =>
+  state.preference.sourceGuideDocs;
 export const selectModalStateDeleteConv = (state: RootState) =>
   state.preference.modalState;
 export const selectSelectedDocs = (state: RootState) =>
   state.preference.selectedDocs;
+export const selectSelectedGuideDocs = (state: RootState) =>
+  state.preference.selectedGuideDocs;
 export const selectConversations = (state: RootState) =>
   state.preference.conversations;
 export const selectConversationId = (state: RootState) =>

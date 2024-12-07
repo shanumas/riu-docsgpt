@@ -35,8 +35,12 @@ import {
   setConversations,
   setModalStateDeleteConv,
   setSelectedDocs,
+  setSelectedGuideDocs,
   setSourceDocs,
+  setSourceGuideDocs,
   setPaginatedDocuments,
+  selectGuideSourceDocs,
+  selectSelectedGuideDocs,
 } from './preferences/preferenceSlice';
 import Spinner from './assets/spinner.svg';
 import SpinnerDark from './assets/spinner-dark.svg';
@@ -53,6 +57,8 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
   const queries = useSelector(selectQueries);
   const docs = useSelector(selectSourceDocs);
   const selectedDocs = useSelector(selectSelectedDocs);
+  const guideDocs = useSelector(selectGuideSourceDocs);
+  const selectedGuideDocs = useSelector(selectSelectedGuideDocs);
   const conversations = useSelector(selectConversations);
   const modalStateDeleteConv = useSelector(selectModalStateDeleteConv);
   const conversationId = useSelector(selectConversationId);
@@ -62,12 +68,17 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
   const { isMobile } = useMediaQuery();
   const [isDarkTheme] = useDarkTheme();
   const [isDocsListOpen, setIsDocsListOpen] = useState(false);
+  const [isGuideDocsListOpen, setIsGuideDocsListOpen] = useState(false);
+
   const { t } = useTranslation();
   const isApiKeySet = useSelector(selectApiKeyStatus);
   const [apiKeyModalState, setApiKeyModalState] =
     useState<ActiveState>('INACTIVE');
 
   const [uploadModalState, setUploadModalState] =
+    useState<ActiveState>('INACTIVE');
+
+  const [uploadModalStateGuide, setUploadModalStateGuide] =
     useState<ActiveState>('INACTIVE');
 
   const navRef = useRef(null);
@@ -116,14 +127,18 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
       .catch((error) => console.error(error));
   };
 
-  const handleDeleteClick = (doc: Doc) => {
+  const handleDeleteClick = (doc: Doc, type: string) => {
     userService
       .deletePath(doc.id ?? '')
       .then(() => {
         return getDocs();
       })
       .then((updatedDocs) => {
-        dispatch(setSourceDocs(updatedDocs));
+        if (type === 'guide') {
+          dispatch(setSourceGuideDocs(updatedDocs));
+        } else {
+          dispatch(setSourceDocs(updatedDocs));
+        }
         const updatedPaginatedDocs = paginatedDocuments?.filter(
           (document) => document.id !== doc.id,
         );
@@ -344,12 +359,14 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
           <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
             <div className="relative my-4 mx-4 flex gap-2">
               <SourceDropdown
-                options={docs}
-                selectedDocs={selectedDocs}
-                setSelectedDocs={setSelectedDocs}
-                isDocsListOpen={isDocsListOpen}
-                setIsDocsListOpen={setIsDocsListOpen}
-                handleDeleteClick={handleDeleteClick}
+                options={guideDocs}
+                selectedDocs={selectedGuideDocs}
+                setSelectedDocs={setSelectedGuideDocs}
+                isDocsListOpen={isGuideDocsListOpen}
+                setIsDocsListOpen={setIsGuideDocsListOpen}
+                handleDeleteClick={(doc: Doc) =>
+                  handleDeleteClick(doc, 'guide')
+                }
                 handlePostDocumentSelect={(option?: string) => {
                   if (isMobile) {
                     setNavOpen(!navOpen);
@@ -377,7 +394,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 setSelectedDocs={setSelectedDocs}
                 isDocsListOpen={isDocsListOpen}
                 setIsDocsListOpen={setIsDocsListOpen}
-                handleDeleteClick={handleDeleteClick}
+                handleDeleteClick={(doc: Doc) => handleDeleteClick(doc, 'user')}
                 handlePostDocumentSelect={(option?: string) => {
                   if (isMobile) {
                     setNavOpen(!navOpen);
@@ -453,7 +470,16 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
         <Upload
           setModalState={setUploadModalState}
           isOnboarding={false}
+          docType="user"
           close={() => setUploadModalState('INACTIVE')}
+        ></Upload>
+      )}
+      {uploadModalStateGuide === 'ACTIVE' && (
+        <Upload
+          setModalState={setUploadModalStateGuide}
+          isOnboarding={false}
+          docType="guide"
+          close={() => setUploadModalStateGuide('INACTIVE')}
         ></Upload>
       )}
     </>
