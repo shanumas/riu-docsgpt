@@ -15,20 +15,20 @@
   "documentation": "Documentation",
   "demo": [
     {
-      "header": "Learn about riuGPT",
-      "query": "What is riuGPT?"
+      "header": "Emission",
+      "query": "How did our carbon emissions this year compare to last year?"
     },
     {
-      "header": "Summarize documentation",
-      "query": "Summarize current context"
+      "header": "Human Rights",
+      "query": "Which sections of our report align with the GRI guidelines on human rights?"
     },
     {
-      "header": "Write Code",
-      "query": "Write code for api request to /api/answer"
+      "header": "Achievement summary",
+      "query": "Summarize our key ESG achievements from the latest reporting cycle."
     },
     {
-      "header": "Learning Assistance",
-      "query": "Write potential questions for context"
+      "header": "Gaps & Improvements",
+      "query": "Which areas need more improvement based on our recent ESG metrics?"
     }
   ],
   "settings": {

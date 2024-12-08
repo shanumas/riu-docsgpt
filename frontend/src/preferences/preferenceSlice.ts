@@ -173,12 +173,8 @@ export const selectSelectedGuideDocsStatus = (state: RootState) =>
   !!state.preference.selectedGuideDocs;
 export const selectSourceDocs = (state: RootState) =>
   state.preference.sourceDocs?.filter((doc) => doc['doc_type'] === 'user');
-export const selectGuideSourceDocs = (state: RootState) => {
-  const filteredDocs = state.preference.sourceDocs?.filter(
-    (doc) => doc['doc_type'] === 'guide',
-  );
-  return filteredDocs;
-};
+export const selectGuideSourceDocs = (state: RootState) =>
+  state.preference.sourceDocs?.filter((doc) => doc['doc_type'] === 'guide');
 export const selectModalStateDeleteConv = (state: RootState) =>
   state.preference.modalState;
 export const selectSelectedDocs = (state: RootState) =>

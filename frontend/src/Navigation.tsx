@@ -358,7 +358,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
           <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
             <div className="relative my-4 mx-4 flex gap-2">
               <SourceDropdown
-                options={guideDocs}
+                options={guideDocs ?? null}
                 selectedDocs={selectedGuideDocs}
                 setSelectedDocs={setSelectedGuideDocs}
                 isDocsListOpen={isGuideDocsListOpen}
@@ -371,6 +371,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                     setNavOpen(!navOpen);
                   }
                 }}
+                setSelectedGuideDocs={undefined}
               />
               <img
                 className="mt-2 h-9 w-9 hover:cursor-pointer"
@@ -388,7 +389,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
           <div className="flex flex-col-reverse border-b-[1px] dark:border-b-purple-taupe">
             <div className="relative my-4 mx-4 flex gap-2">
               <SourceDropdown
-                options={docs}
+                options={docs ?? null}
                 selectedDocs={selectedDocs}
                 setSelectedDocs={setSelectedDocs}
                 isDocsListOpen={isDocsListOpen}
@@ -399,6 +400,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                     setNavOpen(!navOpen);
                   }
                 }}
+                setSelectedGuideDocs={undefined}
               />
               <img
                 className="mt-2 h-9 w-9 hover:cursor-pointer"
