@@ -13,6 +13,7 @@ import { ActiveState, Doc } from '../models/misc';
 import { getDocs } from '../preferences/preferenceApi';
 import {
   setSelectedDocs,
+  setSelectedGuideDocs,
   setSourceDocs,
   selectSourceDocs,
 } from '../preferences/preferenceSlice';
@@ -160,82 +161,87 @@ function Upload({
         timeoutID = setTimeout(() => {
           userService
             .getTaskStatus(progress?.taskId as string)
-            .then((data) => data.json())
+            .then((response) => response.json())
             .then((data) => {
-              if (data.status == 'SUCCESS') {
+              if (data.status === 'SUCCESS') {
                 if (data.result.limited === true) {
-                  getDocs().then((data) => {
-                    dispatch(setSourceDocs(data));
-                    dispatch(
-                      setSelectedDocs(
-                        Array.isArray(data) &&
-                          data?.find(
-                            (d: Doc) => d.type?.toLowerCase() === 'local',
-                          ),
-                      ),
-                    );
+                  // Handle limited result (possibly token limit exceeded)
+                  getDocs().then((docs) => {
+                    dispatch(setSourceDocs(docs));
+                    // Assuming 'guide' is considered limited
+                    const guideDoc =
+                      Array.isArray(docs) &&
+                      docs.find(
+                        (d: Doc) => d.doc_type?.toLowerCase() === 'guide',
+                      );
+                    if (guideDoc) {
+                      dispatch(setSelectedGuideDocs(guideDoc));
+                    }
+                    // Optionally handle other types if needed
                   });
-                  setProgress(
-                    (progress) =>
-                      progress && {
-                        ...progress,
-                        percentage: 100,
-                        failed: true,
-                      },
-                  );
+                  setProgress((prevProgress) => ({
+                    ...prevProgress!,
+                    percentage: 100,
+                    failed: true,
+                  }));
                 } else {
-                  getDocs().then((data) => {
-                    dispatch(setSourceDocs(data));
+                  // Handle successful training
+                  getDocs().then((docs) => {
+                    dispatch(setSourceDocs(docs));
                     const docIds = new Set(
                       (Array.isArray(sourceDocs) &&
-                        sourceDocs?.map((doc: Doc) =>
-                          doc.id ? doc.id : null,
-                        )) ||
+                        sourceDocs.map((doc: Doc) => doc.id)) ||
                         [],
                     );
-                    if (data && Array.isArray(data)) {
-                      data.map((updatedDoc: Doc) => {
+
+                    // Iterate over fetched docs and dispatch accordingly
+                    if (Array.isArray(docs)) {
+                      docs.forEach((updatedDoc: Doc) => {
                         if (updatedDoc.id && !docIds.has(updatedDoc.id)) {
-                          // Select the doc not present in the intersection of current Docs and fetched data
-                          dispatch(setSelectedDocs(updatedDoc));
-                          return;
+                          if (updatedDoc.doc_type?.toLowerCase() === 'guide') {
+                            dispatch(setSelectedGuideDocs(updatedDoc));
+                          } else {
+                            dispatch(setSelectedDocs(updatedDoc));
+                          }
                         }
                       });
                     }
                   });
-                  setProgress(
-                    (progress) =>
-                      progress && {
-                        ...progress,
-                        percentage: 100,
-                        failed: false,
-                      },
-                  );
+                  setProgress((prevProgress) => ({
+                    ...prevProgress!,
+                    percentage: 100,
+                    failed: false,
+                  }));
                   setDocName('');
                   setfiles([]);
                   setProgress(undefined);
                   setModalState('INACTIVE');
                 }
-              } else if (data.status == 'PROGRESS') {
-                setProgress(
-                  (progress) =>
-                    progress && {
-                      ...progress,
-                      percentage: data.result.current,
-                    },
-                );
+              } else if (data.status === 'PROGRESS') {
+                setProgress((prevProgress) => ({
+                  ...prevProgress!,
+                  percentage: data.result.current,
+                }));
               }
+            })
+            .catch((error) => {
+              console.error('Error fetching task status:', error);
+              setProgress((prevProgress) => ({
+                ...prevProgress!,
+                failed: true,
+              }));
             });
         }, 5000);
       }
 
-      // cleanup
+      // Cleanup function to clear the timeout if the component unmounts or dependencies change
       return () => {
         if (timeoutID !== undefined) {
           clearTimeout(timeoutID);
         }
       };
-    }, [progress, dispatch]);
+    }, [progress, dispatch, sourceDocs]);
+
     return (
       <Progress
         title="Training is in progress"

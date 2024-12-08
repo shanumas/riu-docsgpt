@@ -135,6 +135,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
       })
       .then((updatedDocs) => {
         if (type === 'guide') {
+          dispatch(setSourceDocs(updatedDocs));
           dispatch(setSourceGuideDocs(updatedDocs));
         } else {
           dispatch(setSourceDocs(updatedDocs));
@@ -145,14 +146,12 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
         dispatch(
           setPaginatedDocuments(updatedPaginatedDocs || paginatedDocuments),
         );
-        dispatch(
-          setSelectedDocs(
-            Array.isArray(updatedDocs) &&
-              updatedDocs?.find(
-                (doc: Doc) => doc.name.toLowerCase() === 'default',
-              ),
-          ),
-        );
+
+        if (type === 'user') {
+          dispatch(setSelectedDocs(null));
+        } else if (type === 'guide') {
+          dispatch(setSelectedGuideDocs(null));
+        }
       })
       .catch((error) => console.error(error));
   };

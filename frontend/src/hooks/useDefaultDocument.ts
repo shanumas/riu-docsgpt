@@ -19,7 +19,11 @@ export default function useDefaultDocument() {
       if (!selectedDoc)
         Array.isArray(data) &&
           data?.forEach((doc: Doc) => {
-            if (doc.model && doc.name === 'default') {
+            if (
+              doc.model &&
+              doc.name === 'default' &&
+              doc.doc_type === 'user'
+            ) {
               dispatch(setSelectedDocs(doc));
             }
           });
