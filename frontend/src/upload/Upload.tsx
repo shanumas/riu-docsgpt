@@ -15,24 +15,20 @@ import {
   setSelectedDocs,
   setSourceDocs,
   selectSourceDocs,
-  setSelectedGuideDocs,
-  setSourceGuideDocs,
 } from '../preferences/preferenceSlice';
 import WrapperModal from '../modals/WrapperModal';
-
-interface UploadProps {
-  setModalState: (state: ActiveState) => void;
-  isOnboarding: boolean;
-  close: () => void;
-  docType: 'guide' | 'user'; // Added docType prop
-}
 
 function Upload({
   setModalState,
   isOnboarding,
+  docType,
   close,
-  docType, // Destructure docType
-}: UploadProps) {
+}: {
+  setModalState: (state: ActiveState) => void;
+  isOnboarding: boolean;
+  docType: string;
+  close: () => void;
+}) {
   const [docName, setDocName] = useState('');
   const [urlName, setUrlName] = useState('');
   const [url, setUrl] = useState('');
@@ -45,7 +41,7 @@ function Upload({
     number_posts: 10,
   });
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setfiles] = useState<File[]>([]);
   const [progress, setProgress] = useState<{
     type: 'UPLOAD' | 'TRAINING';
     percentage: number;
@@ -70,18 +66,10 @@ function Upload({
   });
 
   const sourceDocs = useSelector(selectSourceDocs);
-  const dispatch = useDispatch();
-
   useEffect(() => {
     if (setTimeoutRef.current) {
       clearTimeout(setTimeoutRef.current);
     }
-    // Cleanup on unmount
-    return () => {
-      if (setTimeoutRef.current) {
-        clearTimeout(setTimeoutRef.current);
-      }
-    };
   }, []);
 
   function ProgressBar({ progressPercent }: { progressPercent: number }) {
@@ -90,14 +78,9 @@ function Upload({
         <div className="relative w-32 h-32 rounded-full">
           <div className="absolute inset-0 rounded-full shadow-[0_0_10px_2px_rgba(0,0,0,0.3)_inset] dark:shadow-[0_0_10px_2px_rgba(0,0,0,0.3)_inset]"></div>
           <div
-            className={`absolute inset-0 rounded-full ${
-              progressPercent === 100
-                ? 'shadow-xl shadow-lime-300/50 dark:shadow-lime-300/50 bg-gradient-to-r from-white to-gray-400 dark:bg-gradient-to-br dark:from-gray-500 dark:to-gray-300'
-                : 'shadow-[0_4px_0_#7D54D1] dark:shadow-[0_4px_0_#7D54D1]'
-            }`}
+            className={`absolute inset-0 rounded-full ${progressPercent === 100 ? 'shadow-xl shadow-lime-300/50 dark:shadow-lime-300/50 bg-gradient-to-r from-white to-gray-400 dark:bg-gradient-to-br dark:from-gray-500 dark:to-gray-300' : 'shadow-[0_4px_0_#7D54D1] dark:shadow-[0_4px_0_#7D54D1]'}`}
             style={{
-              animation:
-                progressPercent === 100 ? 'none' : 'rotate 2s linear infinite',
+              animation: `${progressPercent === 100 ? 'none' : 'rotate 2s linear infinite'}`,
             }}
           ></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -136,13 +119,14 @@ function Upload({
         <p className={`ml-5 text-xl text-red-400 ${isFailed ? '' : 'hidden'}`}>
           Over the token limit, please consider uploading smaller document
         </p>
+        {/* <p className="mt-10 text-2xl">{progress?.percentage || 0}%</p> */}
         <ProgressBar progressPercent={progress?.percentage || 0} />
         {isTraining &&
           (progress?.percentage === 100 ? (
             <button
               onClick={() => {
                 setDocName('');
-                setFiles([]);
+                setfiles([]);
                 setProgress(undefined);
                 setModalState('INACTIVE');
               }}
@@ -167,108 +151,91 @@ function Upload({
   }
 
   function TrainingProgress() {
+    const dispatch = useDispatch();
+
     useEffect(() => {
       let timeoutID: number | undefined;
 
       if ((progress?.percentage ?? 0) < 100) {
-        timeoutID = window.setTimeout(() => {
+        timeoutID = setTimeout(() => {
           userService
             .getTaskStatus(progress?.taskId as string)
             .then((data) => data.json())
             .then((data) => {
-              if (data.status === 'SUCCESS') {
+              if (data.status == 'SUCCESS') {
                 if (data.result.limited === true) {
                   getDocs().then((data) => {
-                    if (docType === 'guide') {
-                      dispatch(setSourceGuideDocs(data));
-                      dispatch(
-                        setSelectedGuideDocs(
-                          data.find(
-                            (doc: Doc) => doc.name.toLowerCase() === 'default',
+                    dispatch(setSourceDocs(data));
+                    dispatch(
+                      setSelectedDocs(
+                        Array.isArray(data) &&
+                          data?.find(
+                            (d: Doc) => d.type?.toLowerCase() === 'local',
                           ),
-                        ),
-                      );
-                    } else {
-                      dispatch(setSourceDocs(data));
-                      dispatch(
-                        setSelectedDocs(
-                          data.find(
-                            (doc: Doc) => doc.name.toLowerCase() === 'default',
-                          ),
-                        ),
-                      );
-                    }
+                      ),
+                    );
                   });
-                  setProgress((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          percentage: 100,
-                          failed: true,
-                        }
-                      : undefined,
+                  setProgress(
+                    (progress) =>
+                      progress && {
+                        ...progress,
+                        percentage: 100,
+                        failed: true,
+                      },
                   );
                 } else {
                   getDocs().then((data) => {
-                    if (docType === 'guide') {
-                      dispatch(setSourceGuideDocs(data));
-                      dispatch(
-                        setSelectedGuideDocs(
-                          data.find(
-                            (doc: Doc) => doc.name.toLowerCase() === 'default',
-                          ),
-                        ),
-                      );
-                    } else {
-                      dispatch(setSourceDocs(data));
-                      dispatch(
-                        setSelectedDocs(
-                          data.find(
-                            (doc: Doc) => doc.name.toLowerCase() === 'default',
-                          ),
-                        ),
-                      );
+                    dispatch(setSourceDocs(data));
+                    const docIds = new Set(
+                      (Array.isArray(sourceDocs) &&
+                        sourceDocs?.map((doc: Doc) =>
+                          doc.id ? doc.id : null,
+                        )) ||
+                        [],
+                    );
+                    if (data && Array.isArray(data)) {
+                      data.map((updatedDoc: Doc) => {
+                        if (updatedDoc.id && !docIds.has(updatedDoc.id)) {
+                          // Select the doc not present in the intersection of current Docs and fetched data
+                          dispatch(setSelectedDocs(updatedDoc));
+                          return;
+                        }
+                      });
                     }
                   });
-                  setProgress((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          percentage: 100,
-                          failed: false,
-                        }
-                      : undefined,
+                  setProgress(
+                    (progress) =>
+                      progress && {
+                        ...progress,
+                        percentage: 100,
+                        failed: false,
+                      },
                   );
                   setDocName('');
-                  setFiles([]);
+                  setfiles([]);
                   setProgress(undefined);
                   setModalState('INACTIVE');
                 }
-              } else if (data.status === 'PROGRESS') {
-                setProgress((prev) =>
-                  prev
-                    ? {
-                        ...prev,
-                        percentage: data.result.current,
-                      }
-                    : undefined,
+              } else if (data.status == 'PROGRESS') {
+                setProgress(
+                  (progress) =>
+                    progress && {
+                      ...progress,
+                      percentage: data.result.current,
+                    },
                 );
               }
-            })
-            .catch((error) => {
-              console.error('Error fetching task status:', error);
             });
         }, 5000);
       }
 
-      // Cleanup
+      // cleanup
       return () => {
         if (timeoutID !== undefined) {
           clearTimeout(timeoutID);
         }
       };
-    }, [progress, dispatch, docType, sourceDocs]);
-
+    }, [progress, dispatch]);
     return (
       <Progress
         title="Training is in progress"
@@ -280,8 +247,8 @@ function Upload({
   }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles);
-    setDocName(acceptedFiles[0]?.name || '');
+    setfiles(acceptedFiles);
+    setDocName(acceptedFiles[0]?.name);
   }, []);
 
   const doNothing = () => undefined;
@@ -292,40 +259,21 @@ function Upload({
       formData.append('file', file);
     });
     formData.append('name', docName);
+    formData.append('type', docType);
     formData.append('user', 'local');
-    formData.append('type', docType); // Add docType
     const apiHost = import.meta.env.VITE_API_HOST;
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', (event) => {
-      const progressPercent = +((event.loaded / event.total) * 100).toFixed(2);
-      setProgress({ type: 'UPLOAD', percentage: progressPercent });
+      const progress = +((event.loaded / event.total) * 100).toFixed(2);
+      setProgress({ type: 'UPLOAD', percentage: progress });
     });
     xhr.onload = () => {
-      try {
-        const response = JSON.parse(xhr.responseText);
-        const { task_id, id } = response; // Assuming backend returns id
-        let finalId = id;
-        if (docType === 'guide') {
-          finalId = `guide-${id}`;
-        }
-        // Optionally, you can update the response to include the prefixed ID
-        // Then proceed to set training progress
-        setTimeoutRef.current = window.setTimeout(() => {
-          setProgress({
-            type: 'TRAINING',
-            percentage: 0,
-            taskId: task_id,
-          });
-        }, 3000);
-      } catch (error) {
-        console.error('Error parsing upload response:', error);
-      }
+      const { task_id } = JSON.parse(xhr.responseText);
+      setTimeoutRef.current = setTimeout(() => {
+        setProgress({ type: 'TRAINING', percentage: 0, taskId: task_id });
+      }, 3000);
     };
-    xhr.onerror = () => {
-      console.error('Upload failed');
-      setProgress({ type: 'UPLOAD', percentage: 0, failed: true });
-    };
-    xhr.open('POST', `${apiHost}/api/upload`);
+    xhr.open('POST', `${apiHost + '/api/upload'}`);
     xhr.send(formData);
   };
 
@@ -333,9 +281,8 @@ function Upload({
     const formData = new FormData();
     formData.append('name', urlName);
     formData.append('user', 'local');
-    formData.append('type', docType); // Add docType
     if (urlType !== null) {
-      formData.append('source', urlType.value);
+      formData.append('source', urlType?.value);
     }
     formData.append('data', url);
     if (
@@ -351,35 +298,16 @@ function Upload({
     const apiHost = import.meta.env.VITE_API_HOST;
     const xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', (event) => {
-      const progressPercent = +((event.loaded / event.total) * 100).toFixed(2);
-      setProgress({ type: 'UPLOAD', percentage: progressPercent });
+      const progress = +((event.loaded / event.total) * 100).toFixed(2);
+      setProgress({ type: 'UPLOAD', percentage: progress });
     });
     xhr.onload = () => {
-      try {
-        const response = JSON.parse(xhr.responseText);
-        const { task_id, id } = response; // Assuming backend returns id
-        let finalId = id;
-        if (docType === 'guide') {
-          finalId = `guide-${id}`;
-        }
-        // Optionally, you can update the response to include the prefixed ID
-        // Then proceed to set training progress
-        setTimeoutRef.current = window.setTimeout(() => {
-          setProgress({
-            type: 'TRAINING',
-            percentage: 0,
-            taskId: task_id,
-          });
-        }, 3000);
-      } catch (error) {
-        console.error('Error parsing remote upload response:', error);
-      }
+      const { task_id } = JSON.parse(xhr.responseText);
+      setTimeoutRef.current = setTimeout(() => {
+        setProgress({ type: 'TRAINING', percentage: 0, taskId: task_id });
+      }, 3000);
     };
-    xhr.onerror = () => {
-      console.error('Remote upload failed');
-      setProgress({ type: 'UPLOAD', percentage: 0, failed: true });
-    };
-    xhr.open('POST', `${apiHost}/api/remote`);
+    xhr.open('POST', `${apiHost + '/api/remote'}`);
     xhr.send(formData);
   };
 
@@ -432,9 +360,9 @@ function Upload({
   let view;
 
   if (progress?.type === 'UPLOAD') {
-    view = <UploadProgress />;
+    view = <UploadProgress></UploadProgress>;
   } else if (progress?.type === 'TRAINING') {
-    view = <TrainingProgress />;
+    view = <TrainingProgress></TrainingProgress>;
   } else {
     view = (
       <div className="flex flex-col gap-4 w-full">
@@ -454,7 +382,6 @@ function Upload({
                 <img
                   src={FileUpload}
                   className="w-12 h-12 mr-2 dark:filter dark:invert dark:brightness-50"
-                  alt="File Upload"
                 />
                 {t('modals.uploadDoc.file')}
               </button>
@@ -465,7 +392,6 @@ function Upload({
                 <img
                   src={WebsiteCollect}
                   className="w-14 h-14 mr-2 dark:filter dark:invert dark:brightness-50"
-                  alt="Remote Upload"
                 />
                 {t('modals.uploadDoc.remote')}
               </button>
@@ -481,7 +407,7 @@ function Upload({
               value={docName}
               onChange={(e) => setDocName(e.target.value)}
               borderVariant="thin"
-            />
+            ></Input>
             <div className="relative bottom-12 left-2 mt-[-20px]">
               <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                 {t('modals.uploadDoc.name')}
@@ -513,7 +439,6 @@ function Upload({
             </div>
           </>
         )}
-
         {activeTab === 'remote' && (
           <>
             <Dropdown
@@ -534,7 +459,7 @@ function Upload({
                   value={urlName}
                   onChange={(e) => setUrlName(e.target.value)}
                   borderVariant="thin"
-                />
+                ></Input>
                 <div className="relative bottom-12 left-2 mt-[-20px]">
                   <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                     {t('modals.uploadDoc.name')}
@@ -546,14 +471,14 @@ function Upload({
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   borderVariant="thin"
-                />
+                ></Input>
                 <div className="relative bottom-12 left-2 mt-[-20px]">
                   <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                     {t('modals.uploadDoc.link')}
                   </span>
                 </div>
               </>
-            ) : urlType.label === 'GitHub' ? (
+            ) : urlType.label === 'GitHub' ? ( // P3f93
               <>
                 <Input
                   placeholder={`Enter ${t('modals.uploadDoc.name')}`}
@@ -561,7 +486,7 @@ function Upload({
                   value={urlName}
                   onChange={(e) => setUrlName(e.target.value)}
                   borderVariant="thin"
-                />
+                ></Input>
                 <div className="relative bottom-12 left-2 mt-[-20px]">
                   <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                     {t('modals.uploadDoc.name')}
@@ -573,7 +498,7 @@ function Upload({
                   value={repoUrl}
                   onChange={(e) => setRepoUrl(e.target.value)}
                   borderVariant="thin"
-                />
+                ></Input>
                 <div className="relative bottom-12 left-2 mt-[-20px]">
                   <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                     {t('modals.uploadDoc.repoUrl')}
@@ -590,7 +515,7 @@ function Upload({
                     value={redditData.client_id}
                     onChange={handleChange}
                     borderVariant="thin"
-                  />
+                  ></Input>
                   <div className="relative bottom-[52px] left-2">
                     <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                       {t('modals.uploadDoc.reddit.id')}
@@ -605,7 +530,7 @@ function Upload({
                     value={redditData.client_secret}
                     onChange={handleChange}
                     borderVariant="thin"
-                  />
+                  ></Input>
                   <div className="relative bottom-[52px] left-2">
                     <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                       {t('modals.uploadDoc.reddit.secret')}
@@ -620,7 +545,7 @@ function Upload({
                     value={redditData.user_agent}
                     onChange={handleChange}
                     borderVariant="thin"
-                  />
+                  ></Input>
                   <div className="relative bottom-[52px] left-2">
                     <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                       {t('modals.uploadDoc.reddit.agent')}
@@ -632,10 +557,10 @@ function Upload({
                     placeholder="Enter search queries"
                     type="text"
                     name="search_queries"
-                    value={redditData.search_queries.join(', ')}
+                    value={redditData.search_queries}
                     onChange={handleChange}
                     borderVariant="thin"
-                  />
+                  ></Input>
                   <div className="relative bottom-[52px] left-2">
                     <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                       {t('modals.uploadDoc.reddit.searchQueries')}
@@ -650,7 +575,7 @@ function Upload({
                     value={redditData.number_posts}
                     onChange={handleChange}
                     borderVariant="thin"
-                  />
+                  ></Input>
                   <div className="relative bottom-[52px] left-2">
                     <span className="bg-white px-2 text-xs text-gray-4000 dark:bg-outer-space dark:text-silver">
                       {t('modals.uploadDoc.reddit.numberOfPosts')}
@@ -661,7 +586,6 @@ function Upload({
             )}
           </>
         )}
-
         {activeTab && (
           <div className="flex w-full justify-between flex-row-reverse">
             {activeTab === 'file' ? (
@@ -713,7 +637,7 @@ function Upload({
             <button
               onClick={() => {
                 setDocName('');
-                setFiles([]);
+                setfiles([]);
                 setActiveTab(null);
               }}
               className="cursor-pointer rounded-3xl px-5 py-2 text-sm font-medium hover:bg-gray-100 dark:bg-transparent dark:text-light-gray dark:hover:bg-[#767183]/50 flex items-center gap-1"
@@ -721,7 +645,6 @@ function Upload({
               <img
                 src={ArrowLeft}
                 className="w-[10px] h-[10px] dark:filter dark:invert"
-                alt="Back"
               />
               {t('modals.uploadDoc.back')}
             </button>
@@ -737,7 +660,7 @@ function Upload({
       close={() => {
         close();
         setDocName('');
-        setFiles([]);
+        setfiles([]);
         setModalState('INACTIVE');
         setActiveTab(null);
       }}

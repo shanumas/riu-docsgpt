@@ -104,7 +104,7 @@ def upload_index(full_path, file_data):
 
 # Define the main function for ingesting and processing documents.
 def ingest_worker(
-    self, directory, formats, name_job, filename, user, retriever="classic"
+    self, directory, formats, name_job, filename, user, doc_type, retriever="classic"
 ):
     """
     Ingest and process documents.
@@ -175,6 +175,7 @@ def ingest_worker(
         "tokens": tokens,
         "retriever": retriever,
         "id": str(id),
+        "doc_type": doc_type,  # New field to indicate the document type
         "type": "local",
     })
     upload_index(full_path, file_data)

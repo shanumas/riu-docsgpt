@@ -17,6 +17,30 @@
               "--port=7091"
           ],
           "jinja": true
-      }
+      },
+      {
+        "name": "Celery Worker",
+        "type": "python",
+        "request": "launch",
+        "module": "celery",
+        "args": [
+            "-A",
+            "application.app.celery",
+            "worker",
+            "--loglevel=INFO"
+        ],
+        "env": {
+            // If you're using Django, uncomment and set the following:
+            // "DJANGO_SETTINGS_MODULE": "application.settings"
+            
+            // Add other environment variables here if needed
+            // Example:
+            // "ENV_VAR_NAME": "value"
+        },
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "cwd": "${workspaceFolder}",
+        "envFile": "${workspaceFolder}/.env" // Optional: if you use a .env file
+    }
   ]
 }

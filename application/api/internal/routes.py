@@ -44,6 +44,7 @@ def upload_index_files():
     type = secure_filename(request.form["type"])
     remote_data = request.form["remote_data"] if "remote_data" in request.form else None
     sync_frequency = secure_filename(request.form["sync_frequency"]) if "sync_frequency" in request.form else None
+    doc_type = request.form["doc_type"]
 
     save_dir = os.path.join(current_dir, "indexes", str(id))
     if settings.VECTOR_STORE == "faiss":
@@ -82,6 +83,7 @@ def upload_index_files():
                     "retriever": retriever,
                     "remote_data": remote_data,
                     "sync_frequency": sync_frequency,
+                    "doc_type": doc_type,
                 }
             },
         )
@@ -99,6 +101,7 @@ def upload_index_files():
                 "retriever": retriever,
                 "remote_data": remote_data,
                 "sync_frequency": sync_frequency,
+                "doc_type": doc_type,
             }
         )
     return {"status": "ok"}

@@ -5,8 +5,8 @@ from application.worker import ingest_worker, remote_worker, sync_worker
 
 
 @celery.task(bind=True)
-def ingest(self, directory, formats, name_job, filename, user):
-    resp = ingest_worker(self, directory, formats, name_job, filename, user)
+def ingest(self, directory, formats, name_job, filename, user, doc_type):
+    resp = ingest_worker(self, directory, formats, name_job, filename, user, doc_type)
     return resp
 
 

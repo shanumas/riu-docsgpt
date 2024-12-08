@@ -56,8 +56,8 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
   const dispatch = useDispatch();
   const queries = useSelector(selectQueries);
   const docs = useSelector(selectSourceDocs);
-  const selectedDocs = useSelector(selectSelectedDocs);
   const guideDocs = useSelector(selectGuideSourceDocs);
+  const selectedDocs = useSelector(selectSelectedDocs);
   const selectedGuideDocs = useSelector(selectSelectedGuideDocs);
   const conversations = useSelector(selectConversations);
   const modalStateDeleteConv = useSelector(selectModalStateDeleteConv);
@@ -377,7 +377,7 @@ export default function Navigation({ navOpen, setNavOpen }: NavigationProps) {
                 className="mt-2 h-9 w-9 hover:cursor-pointer"
                 src={UploadIcon}
                 onClick={() => {
-                  setUploadModalState('ACTIVE');
+                  setUploadModalStateGuide('ACTIVE');
                   if (isMobile) {
                     setNavOpen(!navOpen);
                   }

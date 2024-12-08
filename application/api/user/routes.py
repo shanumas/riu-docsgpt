@@ -305,6 +305,7 @@ class UploadFile(Resource):
 
         user = secure_filename(request.form["user"])
         job_name = secure_filename(request.form["name"])
+        doc_type = secure_filename(request.form["type"])
         try:
             save_dir = os.path.join(current_dir, settings.UPLOAD_FOLDER, user, job_name)
             os.makedirs(save_dir, exist_ok=True)
@@ -346,6 +347,7 @@ class UploadFile(Resource):
                     job_name,
                     final_filename,
                     user,
+                    doc_type
                 )
             else:
                 file = files[0]
@@ -375,6 +377,7 @@ class UploadFile(Resource):
                     job_name,
                     final_filename,
                     user,
+                    doc_type
                 )
 
         except Exception as err:
@@ -553,6 +556,7 @@ class CombinedJson(Resource):
                 data.append(
                     {
                         "id": str(index["_id"]),
+                        "doc_type": index.get("doc_type"),
                         "name": index.get("name"),
                         "date": index.get("date"),
                         "model": settings.EMBEDDINGS_NAME,

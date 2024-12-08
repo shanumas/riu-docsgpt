@@ -12,6 +12,7 @@ export type Doc = {
   type?: string;
   retriever?: string;
   syncFrequency?: string;
+  doc_type?: string;
 };
 
 export type GetDocsResponse = {
