@@ -126,6 +126,8 @@ prefListenerMiddleware.startListening({
   effect: (action, listenerApi) => {
     setLocalRecentDocs(
       (listenerApi.getState() as RootState).preference.selectedDocs ?? null,
+      (listenerApi.getState() as RootState).preference.selectedGuideDocs ??
+        null,
     );
   },
 });
@@ -172,13 +174,9 @@ export const selectSelectedGuideDocsStatus = (state: RootState) =>
 export const selectSourceDocs = (state: RootState) =>
   state.preference.sourceDocs?.filter((doc) => doc['doc_type'] === 'user');
 export const selectGuideSourceDocs = (state: RootState) => {
-  const allDocs = state.preference.sourceDocs;
   const filteredDocs = state.preference.sourceDocs?.filter(
     (doc) => doc['doc_type'] === 'guide',
   );
-  allDocs?.forEach((doc) => {
-    console.log('Doc type:  ' + doc.doc_type);
-  });
   return filteredDocs;
 };
 export const selectModalStateDeleteConv = (state: RootState) =>

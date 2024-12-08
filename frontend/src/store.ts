@@ -12,6 +12,7 @@ const prompt = localStorage.getItem('DocsGPTPrompt');
 const chunks = localStorage.getItem('DocsGPTChunks');
 const token_limit = localStorage.getItem('DocsGPTTokenLimit');
 const doc = localStorage.getItem('DocsGPTRecentDocs');
+const guidedoc = localStorage.getItem('DocsGPTRecentGuideDocs');
 
 const preloadedState: { preference: Preference } = {
   preference: {
@@ -23,6 +24,8 @@ const preloadedState: { preference: Preference } = {
     chunks: JSON.parse(chunks ?? '2').toString(),
     token_limit: token_limit ? parseInt(token_limit) : 2000,
     selectedDocs: doc !== null ? JSON.parse(doc) : null,
+    selectedGuideDocs: guidedoc !== null ? JSON.parse(guidedoc) : null,
+
     conversations: {
       data: null,
       loading: false,

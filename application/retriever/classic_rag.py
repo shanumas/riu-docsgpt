@@ -21,6 +21,7 @@ class ClassicRAG(BaseRetriever):
     ):
         self.question = question
         self.primary_vectorstore = source.get('active_docs', None)
+        self.additional_vectorstore = source.get('guide_docs', None)
         self.chat_history = chat_history if chat_history else []
         self.prompt = prompt
         self.chunks = chunks
@@ -35,10 +36,7 @@ class ClassicRAG(BaseRetriever):
                 self.gpt_model, settings.DEFAULT_MAX_HISTORY
             )
         )
-        self.user_api_key = user_api_key
-
-        # Initialize the additional vector store internally
-        self.additional_vectorstore = "674d48ccc3527214d3b90d6f"
+        self.user_api_key = user_api_key        
 
     def _get_data_from_vectorstore(self, vectorstore, k):
         if k == 0 or not vectorstore:

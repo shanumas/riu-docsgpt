@@ -92,8 +92,12 @@ export function setLocalPrompt(prompt: string): void {
   localStorage.setItem('DocsGPTPrompt', prompt);
 }
 
-export function setLocalRecentDocs(doc: Doc | null): void {
+export function setLocalRecentDocs(
+  doc: Doc | null,
+  guidedoc: Doc | null,
+): void {
   localStorage.setItem('DocsGPTRecentDocs', JSON.stringify(doc));
+  localStorage.setItem('DocsGPTRecentGuideDocs', JSON.stringify(guidedoc));
 
   let docPath = 'default';
   if (doc?.type === 'local') {

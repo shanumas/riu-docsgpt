@@ -278,6 +278,7 @@ def complete_stream(
 
 @answer_ns.route("/stream")
 class Stream(Resource):
+    print("IN stream function")
     stream_model = api.model(
         "StreamModel",
         {

@@ -34,6 +34,7 @@ export interface Query {
 export interface RetrievalPayload {
   question: string;
   active_docs?: string;
+  guide_docs?: string;
   retriever?: string;
   history: string;
   conversation_id: string | null;

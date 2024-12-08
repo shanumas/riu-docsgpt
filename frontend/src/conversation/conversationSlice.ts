@@ -108,6 +108,7 @@ export const fetchAnswer = createAsyncThunk<
         question,
         signal,
         state.preference.selectedDocs!,
+        state.preference.selectedGuideDocs!,
         state.conversation.queries,
         state.conversation.conversationId,
         state.preference.prompt.id,

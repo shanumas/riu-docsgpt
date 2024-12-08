@@ -6,6 +6,7 @@ import { Doc } from '../models/misc';
 import {
   selectSelectedDocs,
   setSelectedDocs,
+  setSelectedGuideDocs,
   setSourceDocs,
 } from '../preferences/preferenceSlice';
 
@@ -19,13 +20,13 @@ export default function useDefaultDocument() {
       if (!selectedDoc)
         Array.isArray(data) &&
           data?.forEach((doc: Doc) => {
-            if (
-              doc.model &&
-              doc.name === 'default' &&
-              doc.doc_type === 'user'
-            ) {
-              dispatch(setSelectedDocs(doc));
-            }
+            if (doc.model && doc.name === 'default')
+              if (doc.doc_type === 'user') {
+                dispatch(setSelectedDocs(doc));
+              } else if (doc.doc_type === 'guide') {
+                dispatch(setSelectedDocs(doc));
+                dispatch(setSelectedGuideDocs(doc));
+              }
           });
     });
   };

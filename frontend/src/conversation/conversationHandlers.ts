@@ -6,6 +6,7 @@ export function handleFetchAnswer(
   question: string,
   signal: AbortSignal,
   selectedDocs: Doc | null,
+  selectedGuideDocs: Doc | null,
   history: Array<any> = [],
   conversationId: string | null,
   promptId: string | null,
@@ -43,6 +44,9 @@ export function handleFetchAnswer(
   if (selectedDocs && 'id' in selectedDocs) {
     payload.active_docs = selectedDocs.id as string;
   }
+  if (selectedGuideDocs && 'id' in selectedGuideDocs) {
+    payload.guide_docs = selectedGuideDocs.id as string;
+  }
   payload.retriever = selectedDocs?.retriever as string;
   return conversationService
     .answer(payload, signal)
@@ -69,6 +73,7 @@ export function handleFetchAnswerSteaming(
   question: string,
   signal: AbortSignal,
   selectedDocs: Doc | null,
+  selectedGuideDocs: Doc | null,
   history: Array<any> = [],
   conversationId: string | null,
   promptId: string | null,
@@ -92,6 +97,9 @@ export function handleFetchAnswerSteaming(
   };
   if (selectedDocs && 'id' in selectedDocs) {
     payload.active_docs = selectedDocs.id as string;
+  }
+  if (selectedGuideDocs && 'id' in selectedGuideDocs) {
+    payload.guide_docs = selectedGuideDocs.id as string;
   }
   payload.retriever = selectedDocs?.retriever as string;
 
@@ -149,6 +157,7 @@ export function handleFetchAnswerSteaming(
 export function handleSearch(
   question: string,
   selectedDocs: Doc | null,
+  selectedGuideDocs: Doc | null,
   conversation_id: string | null,
   history: Array<any> = [],
   chunks: string,
@@ -167,6 +176,9 @@ export function handleSearch(
   };
   if (selectedDocs && 'id' in selectedDocs)
     payload.active_docs = selectedDocs.id as string;
+  if (selectedGuideDocs && 'id' in selectedGuideDocs) {
+    payload.guide_docs = selectedGuideDocs.id as string;
+  }
   payload.retriever = selectedDocs?.retriever as string;
   return conversationService
     .search(payload)

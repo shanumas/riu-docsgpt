@@ -8,6 +8,7 @@ type Props = {
   options: Doc[] | null;
   selectedDocs: Doc | null;
   setSelectedDocs: any;
+  setSelectedGuideDocs: any;
   isDocsListOpen: boolean;
   setIsDocsListOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleDeleteClick: any;
@@ -17,6 +18,7 @@ type Props = {
 function SourceDropdown({
   options,
   setSelectedDocs,
+  setSelectedGuideDocs,
   selectedDocs,
   setIsDocsListOpen,
   isDocsListOpen,
@@ -85,7 +87,13 @@ function SourceDropdown({
                     key={index}
                     className="flex cursor-pointer items-center justify-between hover:bg-gray-100 dark:text-bright-gray dark:hover:bg-purple-taupe"
                     onClick={() => {
-                      dispatch(setSelectedDocs(option));
+                      if (selectedDocs?.doc_type === 'guide') {
+                        dispatch(setSelectedDocs(option));
+                        dispatch(setSelectedGuideDocs(option));
+                      } else {
+                        dispatch(setSelectedDocs(option));
+                      }
+
                       setIsDocsListOpen(false);
                       handlePostDocumentSelect(option);
                     }}
