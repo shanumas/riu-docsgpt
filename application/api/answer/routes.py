@@ -344,7 +344,8 @@ class Stream(Resource):
                 user_api_key = data["api_key"]
 
             elif "active_docs" in data:
-                source = {"active_docs": data["active_docs"]}
+                source = {"active_docs": data["active_docs"], "guide_docs": data["guide_docs"]}
+
                 retriever_name = get_retriever(data["active_docs"]) or retriever_name
                 user_api_key = None
 
