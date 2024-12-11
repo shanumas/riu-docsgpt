@@ -1,0 +1,59 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  VITE_API_HOST: 'http://localhost:7091'
+  VITE_API_STREAMING: $(VITE_API_STREAMING)
+  API_KEY: $(API_KEY)
+  EMBEDDINGS_KEY: $(API_KEY)
+  LLM_NAME: $(LLM_NAME)
+  CELERY_BROKER_URL: 'redis://redis:6379/0'
+  CELERY_RESULT_BACKEND: 'redis://redis:6379/1'
+  MONGO_URI: 'mongodb://mongo:27017/docsgpt'
+  CACHE_REDIS_URL: 'redis://redis:6379/2'
+
+jobs:
+- job: BuildAndDeploy
+  steps:
+  - task: DockerCompose@0
+    displayName: 'Build and deploy services'
+    inputs:
+      containerregistry: $(dockerRegistryServiceConnection)
+      dockerComposeFile: 'docker-compose.yml'
+      projectName: 'azure-devops'
+      action: 'Run Services'
+      buildImages: true
+
+  - task: Docker@2
+    displayName: 'Build frontend'
+    inputs:
+      containerRegistry: $(dockerRegistryServiceConnection)
+      repository: './frontend'
+      command: 'build'
+      Dockerfile: './frontend/Dockerfile'
+      tags: |
+        $(Build.BuildId)
+
+  - task: Docker@2
+    displayName: 'Build backend'
+    inputs:
+      containerRegistry: $(dockerRegistryServiceConnection)
+      repository: './application'
+      command: 'build'
+      Dockerfile: './application/Dockerfile'
+      tags: |
+        $(Build.BuildId)
+
+  - script: |
+      docker-compose up -d
+    displayName: 'Start all services'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish build artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
