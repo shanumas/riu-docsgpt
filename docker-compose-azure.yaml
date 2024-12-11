@@ -1,14 +1,12 @@
 services:
-  frontend:
-    command: 'build'
-    projects: './frontend'
-    environment:
-      - VITE_API_HOST=http://localhost:7091
-      - VITE_API_STREAMING=$VITE_API_STREAMING
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
+  build: ./frontend
+  environment:
+    - VITE_API_HOST=http://localhost:7091
+    - VITE_API_STREAMING=$VITE_API_STREAMING
+  ports:
+    - "5173:5173"
+  depends_on:
+    - backend
 
   backend:
     build: ./application
