@@ -18,6 +18,13 @@ variables:
 jobs:
 - job: BuildAndDeploy
   steps:
+  - script: |
+      echo "Public IP:"
+      curl ifconfig.me
+      echo "Local IP:"
+      hostname -I
+    displayName: 'Find Agent IP Address'
+
 
   - script: |
       docker network create my-network || true
