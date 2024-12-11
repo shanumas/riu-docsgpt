@@ -18,25 +18,6 @@ variables:
 jobs:
 - job: BuildAndDeploy
   steps:
-  - task: Docker@2
-    displayName: 'Build frontend'
-    inputs:
-      containerRegistry: $(dockerRegistryServiceConnection)
-      repository: './frontend'
-      command: 'build'
-      Dockerfile: './frontend/Dockerfile'
-      tags: |
-        $(Build.BuildId)
-
-  - task: Docker@2
-    displayName: 'Build backend'
-    inputs:
-      containerRegistry: $(dockerRegistryServiceConnection)
-      repository: './application'
-      command: 'build'
-      Dockerfile: './application/Dockerfile'
-      tags: |
-        $(Build.BuildId)
 
   - script: |
       docker network create my-network || true
