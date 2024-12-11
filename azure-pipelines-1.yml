@@ -7,8 +7,6 @@ pool:
 variables:
   VITE_API_HOST: 'http://localhost:7091'
   VITE_API_STREAMING: true
-  API_KEY: $(API_KEY)
-  EMBEDDINGS_KEY: $(API_KEY)
   LLM_NAME: 'docsgpt'
   USER_AGENT: 'myagent'
   CELERY_BROKER_URL: 'redis://redis:6379/0'
