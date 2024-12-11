@@ -16,6 +16,17 @@ variables:
   dockerRegistryServiceConnection: 'e6c021b0-4243-40ec-a488-70d5a39cc029'
 
 jobs:
+- deployment: DeployToEnvironment
+  displayName: 'Deploy to riu-vm Environment'
+  environment: 
+    name: riu-vm
+    resourceType: VirtualMachine
+
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - script: echo Nilan Paps
 - job: BuildAndDeploy
   steps:
   - script: |
