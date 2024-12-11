@@ -62,10 +62,3 @@ services:
     depends_on:
         - redis
         - mongo
-
-
-
-
-
-volumes:
-  mongodb_data_container:
