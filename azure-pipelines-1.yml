@@ -6,10 +6,11 @@ pool:
 
 variables:
   VITE_API_HOST: 'http://localhost:7091'
-  VITE_API_STREAMING: $(VITE_API_STREAMING)
+  VITE_API_STREAMING: true
   API_KEY: $(API_KEY)
   EMBEDDINGS_KEY: $(API_KEY)
-  LLM_NAME: $(LLM_NAME)
+  LLM_NAME: 'docsgpt'
+  USER_AGENT: 'myagent'
   CELERY_BROKER_URL: 'redis://redis:6379/0'
   CELERY_RESULT_BACKEND: 'redis://redis:6379/1'
   MONGO_URI: 'mongodb://mongo:27017/docsgpt'
