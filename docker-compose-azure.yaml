@@ -1,4 +1,16 @@
 services:
+  redis:
+    image: redis:6-alpine
+    ports:
+      - 6379:6379
+
+  mongo:
+    image: mongo:6
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+      
   build: ./frontend
   environment:
     - VITE_API_HOST=http://localhost:7091
@@ -50,17 +62,7 @@ services:
         - redis
         - mongo
 
-  redis:
-    image: redis:6-alpine
-    ports:
-      - 6379:6379
 
-  mongo:
-    image: mongo:6
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data_container:/data/db
 
 
 
