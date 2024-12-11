@@ -20,15 +20,6 @@ variables:
 jobs:
 - job: BuildAndDeploy
   steps:
-  - task: DockerCompose@0
-    displayName: 'Build and deploy services'
-    inputs:
-      containerregistry: $(dockerRegistryServiceConnection)
-      dockerComposeFile: 'docker-compose.yml'
-      projectName: 'azure-devops'
-      action: 'Run Services'
-      buildImages: true
-
   - task: Docker@2
     displayName: 'Build frontend'
     inputs:
@@ -50,8 +41,12 @@ jobs:
         $(Build.BuildId)
 
   - script: |
-      docker-compose up -d
-    displayName: 'Start all services'
+      docker network create my-network || true
+      docker run -d --name redis --net my-network -p 6379:6379 redis:6-alpine
+      docker run -d --name mongo --net my-network -p 27017:27017 -v mongodb_data_container:/data/db mongo:6
+      docker run -d --name frontend --net my-network -p 5173:5173 $(dockerRegistryServiceConnection)/frontend:$(Build.BuildId)
+      docker run -d --name backend --net my-network -p 7091:7091 $(dockerRegistryServiceConnection)/backend:$(Build.BuildId)
+    displayName: 'Start all services (redis, mongo, frontend, backend)'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish build artifacts'
