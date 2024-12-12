@@ -1,0 +1,38 @@
+# Python to Linux Web App on Azure
+# Build your Python project and deploy it to Azure as a Linux Web App.
+# Change python version to one thats appropriate for your application.
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- main
+
+variables:
+  # Azure Resource Manager connection created during pipeline creation
+  azureServiceConnectionId: 'e93fc054-e853-49b9-b388-f08043821290'
+
+  # Web app name
+  webAppName: ''
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  # Environment name
+  environmentName: ''
+
+  # Project root folder. Point to the folder containing manage.py file.
+  projectRoot: $(System.DefaultWorkingDirectory)
+
+  pythonVersion: '3.12'
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: BuildJob
+    displayName: Build Job
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - script: |
+        ./setup.sh
+      displayName: Run Setup Script
