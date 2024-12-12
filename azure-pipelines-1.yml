@@ -19,7 +19,7 @@ jobs:
 - deployment: DeployToEnvironment
   displayName: 'Deploy to riu-vm Environment'
   environment: 
-    name: riu-vm
+    name: pipeline-env
     resourceName: UMA
     resourceType: VirtualMachine
 
