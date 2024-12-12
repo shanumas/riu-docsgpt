@@ -1,6 +1,6 @@
 # Python to Linux Web App on Azure
 # Build your Python project and deploy it to Azure as a Linux Web App.
-# Change python version to one thats appropriate for your application.
+# Change python version to one that's appropriate for your application.
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
@@ -33,14 +33,20 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    # Print the IP address of the pipeline agent
+    - script: |
+        ip_address=$(hostname -I | awk '{print $1}')
+        echo "Pipeline Agent IP Address: $ip_address"
+      displayName: Get and Print IP Address
     # Install Docker Compose
     - script: |
         sudo apt-get update
         sudo apt-get install -y docker-compose
       displayName: Install Docker Compose
 
+    
+
     # Run your setup script
     - script: |
         ./setup.sh
       displayName: Run Setup Script
-
