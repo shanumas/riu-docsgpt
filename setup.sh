@@ -121,20 +121,5 @@ use_docsgpt() {
 }
 
 # Prompt the user for their choice
-prompt_user
+use_docsgpt
 
-# Handle the user's choice
-case $choice in
-    1)
-        use_docsgpt
-        ;;
-    2)
-        download_locally
-        ;;
-    3)
-        use_openai
-        ;;
-    *)
-        echo "Invalid choice. Please choose either 1 or 2."
-        ;;
-esac
