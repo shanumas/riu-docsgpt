@@ -9,12 +9,37 @@ prompt_user() {
     read -p "Enter your choice (1, 2 or 3): " choice
 }
 
+# Function to install Docker if not installed
+install_docker() {
+    echo "Docker is not installed. Installing Docker..."
+    # Install dependencies
+    sudo apt update
+    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+    # Add Docker GPG key
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    # Add Docker repository
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # Install Docker
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io
+    echo "Docker installed successfully."
+}
+
+# Function to check if Docker is installed
+check_docker_installed() {
+    if ! command -v docker &> /dev/null; then
+        install_docker
+    else
+        echo "Docker is already installed."
+    fi
+}
+
 check_and_start_docker() {
+    check_docker_installed
+
     # Check if Docker is running
     if ! docker info > /dev/null 2>&1; then
         echo "Docker is not running. Starting Docker..."
-
-        # Attempt to start Docker daemon manually
         if ! pgrep -x "dockerd" > /dev/null; then
             echo "Starting Docker daemon..."
             sudo dockerd > /dev/null 2>&1 &
